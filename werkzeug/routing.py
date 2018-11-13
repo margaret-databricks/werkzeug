@@ -1981,7 +1981,7 @@ class MapAdapter(object):
                     return rv
 
     def build(self, endpoint, values=None, method=None, force_external=False,
-              append_unknown=True):
+              append_unknown=True, scheme=None):
         """Building URLs works pretty much the other way round.  Instead of
         `match` you call `build` and pass it the endpoint and a dict of
         arguments for the placeholders.
@@ -2083,9 +2083,15 @@ class MapAdapter(object):
             or (not self.map.host_matching and domain_part == self.subdomain)
         ):
             return '%s/%s' % (self.script_name.rstrip('/'), path.lstrip('/'))
-        return str('%s//%s%s/%s' % (
-            self.url_scheme + ':' if self.url_scheme else '',
+
+        if scheme is not None:
+            scheme = scheme + ':'
+        else:
+            scheme = self.url_scheme + ':' if self.url_scheme else ''
+
+        return '{0}//{1}{2}/{3}'.format(
+            scheme,
             host,
             self.script_name[:-1],
             path.lstrip('/')
-        ))
+        )
